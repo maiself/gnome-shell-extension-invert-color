@@ -108,14 +108,15 @@ InvertWindow.prototype = {
 let invert_window;
 
 function init() {
-	invert_window = new InvertWindow();
 }
 
 function enable() {
+	invert_window = new InvertWindow();
 	invert_window.enable();
 }
 
 function disable() {
 	invert_window.disable();
+	invert_window = null;
 }
 
