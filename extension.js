@@ -55,10 +55,12 @@ InvertWindow.prototype = {
 			if(meta_window.has_focus()) {
 				if(actor.get_effect('invert-color')) {
 					actor.remove_effect_by_name('invert-color');
+					delete meta_window._invert_window_tag;
 				}
 				else {
 					let effect = new InvertWindowEffect();
 					actor.add_effect_with_name('invert-color', effect);
+					meta_window._invert_window_tag = true;
 				}
 			}
 		}, this);
@@ -88,6 +90,14 @@ InvertWindow.prototype = {
 			}
 			return clone;
 		});
+
+		global.get_window_actors().forEach(function(actor) {
+			let meta_window = actor.get_meta_window();
+			if(meta_window.hasOwnProperty('_invert_window_tag')) {
+				let effect = new InvertWindowEffect();
+				actor.add_effect_with_name('invert-color', effect);
+			}
+		}, this);
 	},
 
 	disable: function() {
