@@ -33,7 +33,16 @@ const InvertWindowEffect = new Lang.Class({
 
 	_init: function(params) {
 		this.parent(params);
-		this.set_shader_source('uniform sampler2D tex; void main() { vec4 color = texture2D(tex, cogl_tex_coord_in[0].st); color.rgb /= color.a; color.rgb = vec3(1.0, 1.0, 1.0) - color.rgb; color.rgb *= color.a; cogl_color_out = color * cogl_color_in; }');
+		this.set_shader_source(' \
+			uniform sampler2D tex; \
+			void main() { \
+				vec4 color = texture2D(tex, cogl_tex_coord_in[0].st); \
+				color.rgb /= color.a; \
+				color.rgb = vec3(1.0, 1.0, 1.0) - color.rgb; \
+				color.rgb *= color.a; \
+				cogl_color_out = color * cogl_color_in; \
+			} \
+		');
 	},
 
 	vfunc_paint_target: function() {
