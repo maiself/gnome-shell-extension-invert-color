@@ -40,7 +40,11 @@ const InvertWindowEffect = new Lang.Class({
 				if(color.a > 0.0) { \
 					color.rgb /= color.a; \
 				} \
-				color.rgb = vec3(1.0, 1.0, 1.0) - color.rgb; \
+				float maxColor = max (color.r, max (color.g, color.b)); \
+				float minColor = min (color.r, min (color.g, color.b)); \
+				float lightness = (maxColor + minColor) / 2.0; \
+				float delta = (1.0 - lightness) - lightness; \
+				color.rgb = (color.rgb + delta); \
 				color.rgb *= color.a; \
 				cogl_color_out = color * cogl_color_in; \
 			} \
@@ -140,4 +144,3 @@ function disable() {
 	invert_window.disable();
 	invert_window = null;
 }
-
