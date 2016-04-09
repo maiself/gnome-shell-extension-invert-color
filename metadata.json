@@ -3,7 +3,7 @@
 	"name": "Invert Window Color",
 	"description": "Inverts the color of individual windows\nDefault shortcut is Super+I",
 	"url": "https://github.com/maiself/gnome-shell-extension-invert-color",
-	"shell-version": ["3.16", "3.18"],
+	"shell-version": ["3.16", "3.18", "3.20"],
 	"settings-schema": "org.gnome.shell.extensions.invert-window",
 	"version": 1
 }
