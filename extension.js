@@ -8,24 +8,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Self = ExtensionUtils.getCurrentExtension();
 const Convenience = Self.imports.convenience;
 
-const ui = imports.ui;
-
 const SHORTCUT = 'invert-window-shortcut';
-
-function inject_after(proto, name, func) {
-	let orig = proto[name];
-
-	proto[name] = function() {
-		let ret = orig.apply(this, arguments);
-		return func.apply(this, [ret].concat([].slice.call(arguments)));
-	}
-
-	return orig;
-}
-
-function remove_injection(proto, name, orig) {
-	proto[name] = orig;
-}
 
 const InvertWindowEffect = new Lang.Class({
 	Name: 'InvertWindowEffect',
@@ -55,8 +38,6 @@ const InvertWindowEffect = new Lang.Class({
 
 function InvertWindow() {
 	this.settings = Convenience.getSettings();
-	this.workspace_injection = null;
-	this.alttab_injection = null;
 }
 
 InvertWindow.prototype = {
@@ -86,22 +67,6 @@ InvertWindow.prototype = {
 			Lang.bind(this, this.toggle_effect)
 		);
 
-		this.workspace_injection = inject_after(ui.workspace.WindowClone.prototype, '_init', function(ret) {
-			if(this.realWindow.get_effect('invert-color')) {
-				let effect = new InvertWindowEffect();
-				this.actor.add_effect_with_name('invert-color', effect);
-			}
-			return ret;
-		});
-
-		this.alttab_injection = inject_after(ui.altTab, '_createWindowClone', function(clone, window, size) {
-			if(window.get_effect('invert-color')) {
-				let effect = new InvertWindowEffect();
-				clone.add_effect_with_name('invert-color', effect);
-			}
-			return clone;
-		});
-
 		global.get_window_actors().forEach(function(actor) {
 			let meta_window = actor.get_meta_window();
 			if(meta_window.hasOwnProperty('_invert_window_tag')) {
@@ -117,12 +82,6 @@ InvertWindow.prototype = {
 		global.get_window_actors().forEach(function(actor) {
 			actor.remove_effect_by_name('invert-color');
 		}, this);
-
-		remove_injection(ui.workspace.WindowClone.prototype, '_init', this.workspace_injection);
-		this.workspace_injection = null;
-
-		remove_injection(ui.altTab, '_createWindowClone', this.alttab_injection);
-		this.alttab_injection = null;
 	}
 };
 
