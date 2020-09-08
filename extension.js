@@ -10,23 +10,40 @@ const Convenience = Self.imports.convenience;
 
 const SHORTCUT = 'invert-window-shortcut';
 
-const InvertWindowEffect = new Lang.Class({
-	Name: 'InvertWindowEffect',
+const TrueInvertWindowEffect = new Lang.Class({
+	Name: 'TrueInvertWindowEffect',
 	Extends: Clutter.ShaderEffect,
 
 	vfunc_get_static_shader_source: function() {
-		return ' \
-			uniform sampler2D tex; \
-			void main() { \
-				vec4 color = texture2D(tex, cogl_tex_coord_in[0].st); \
-				if(color.a > 0.0) { \
-					color.rgb /= color.a; \
-				} \
-				color.rgb = vec3(1.0, 1.0, 1.0) - color.rgb; \
-				color.rgb *= color.a; \
-				cogl_color_out = color * cogl_color_in; \
-			} \
-		';
+		return `
+			uniform bool invert_color;
+			uniform float opacity = 1.0;
+			uniform sampler2D tex;
+
+			/**
+			 * based on shift_whitish.glsl https://github.com/vn971/linux-color-inversion
+			 */
+			void main() {
+				vec4 c = texture2D(tex, cogl_tex_coord_in[0].st);
+				
+				/* shifted */
+				float white_bias = .17;
+				float m = 1.0 + white_bias;
+				
+				float shift = white_bias + c.a - min(c.r, min(c.g, c.b)) - max(c.r, max(c.g, c.b));
+				
+				c = vec4((shift + c.r) / m, 
+						(shift + c.g) / m, 
+						(shift + c.b) / m, 
+						c.a);
+					
+				/* non-shifted */
+				// float shift = c.a - min(c.r, min(c.g, c.b)) - max(c.r, max(c.g, c.b));
+				// c = vec4(shift + c.r, shift + c.g, shift + c.b, c.a);
+
+				cogl_color_out = c;
+			}
+		`;
 	},
 
 	vfunc_paint_target: function(paint_context) {
@@ -49,7 +66,7 @@ InvertWindow.prototype = {
 					delete meta_window._invert_window_tag;
 				}
 				else {
-					let effect = new InvertWindowEffect();
+					let effect = new TrueInvertWindowEffect();
 					actor.add_effect_with_name('invert-color', effect);
 					meta_window._invert_window_tag = true;
 				}
@@ -69,7 +86,7 @@ InvertWindow.prototype = {
 		global.get_window_actors().forEach(function(actor) {
 			let meta_window = actor.get_meta_window();
 			if(meta_window.hasOwnProperty('_invert_window_tag')) {
-				let effect = new InvertWindowEffect();
+				let effect = new TrueInvertWindowEffect();
 				actor.add_effect_with_name('invert-color', effect);
 			}
 		}, this);
