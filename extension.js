@@ -29,9 +29,9 @@ const InvertWindowEffect = new Lang.Class({
 		';
 	},
 
-	vfunc_paint_target: function(paint_context) {
+	vfunc_paint_target: function(node, paint_context) {
 		this.set_uniform_value("tex", 0);
-		this.parent(paint_context);
+		this.parent(node, paint_context);
 	}
 });
 
