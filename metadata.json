@@ -6,6 +6,7 @@
   "shell-version": [
     "3.32",
     "3.36",
+    "3.38",
     "40"
   ],
   "url": "https://github.com/jackkenney/gnome-true-color-invert",
