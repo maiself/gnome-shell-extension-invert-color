@@ -1,6 +1,6 @@
 # True Color Invert
 
-GNOME Shell extension for inverting the color of windows
+GNOME shell extension for inverting window colors in hue preserving manner. Effectively a manual dark theme for GNOME windows.
 
 Available on the GNOME Extensions website here:
 
