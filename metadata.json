@@ -4,10 +4,11 @@
   "name": "True Color Invert",
   "settings-schema": "org.gnome.shell.extensions.true-color-invert",
   "shell-version": [
+    "3.32",
     "3.36",
     "40"
   ],
   "url": "https://github.com/jackkenney/gnome-true-color-invert",
   "uuid": "true-color-invert@jackkenney",
-  "version": 8
+  "version": 3
 }
