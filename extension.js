@@ -46,11 +46,11 @@ const TrueInvertWindowEffect = new Lang.Class({
 		`;
 	},
 
-	vfunc_paint_target: function (node = null, paint_context = null) {
+	vfunc_paint_target: function (paint_node = null, paint_context = null) {
 		this.set_uniform_value("tex", 0);
 		if (paint_context) {
-			if (node)
-				this.parent(node, paint_context);
+			if (paint_node)
+				this.parent(paint_node, paint_context);
 			else
 				this.parent(paint_context);
 		} else
