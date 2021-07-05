@@ -14,7 +14,7 @@ const TrueInvertWindowEffect = new Lang.Class({
 	Name: 'TrueInvertWindowEffect',
 	Extends: Clutter.ShaderEffect,
 
-	vfunc_get_static_shader_source: function() {
+	vfunc_get_static_shader_source: function () {
 		return `
 			uniform bool invert_color;
 			uniform float opacity = 1.0;
@@ -46,9 +46,15 @@ const TrueInvertWindowEffect = new Lang.Class({
 		`;
 	},
 
-	vfunc_paint_target: function(paint_context) {
+	vfunc_paint_target: function (paint_node = null, paint_context = null) {
 		this.set_uniform_value("tex", 0);
-		this.parent(paint_context);
+		if (paint_context) {
+			if (paint_node)
+				this.parent(paint_node, paint_context);
+			else
+				this.parent(paint_context);
+		} else
+			this.parent();
 	}
 });
 
@@ -57,11 +63,11 @@ function InvertWindow() {
 }
 
 InvertWindow.prototype = {
-	toggle_effect: function() {
-		global.get_window_actors().forEach(function(actor) {
+	toggle_effect: function () {
+		global.get_window_actors().forEach(function (actor) {
 			let meta_window = actor.get_meta_window();
-			if(meta_window.has_focus()) {
-				if(actor.get_effect('invert-color')) {
+			if (meta_window.has_focus()) {
+				if (actor.get_effect('invert-color')) {
 					actor.remove_effect_by_name('invert-color');
 					delete meta_window._invert_window_tag;
 				}
@@ -74,7 +80,7 @@ InvertWindow.prototype = {
 		}, this);
 	},
 
-	enable: function() {
+	enable: function () {
 		Main.wm.addKeybinding(
 			SHORTCUT,
 			this.settings,
@@ -83,19 +89,19 @@ InvertWindow.prototype = {
 			Lang.bind(this, this.toggle_effect)
 		);
 
-		global.get_window_actors().forEach(function(actor) {
+		global.get_window_actors().forEach(function (actor) {
 			let meta_window = actor.get_meta_window();
-			if(meta_window.hasOwnProperty('_invert_window_tag')) {
+			if (meta_window.hasOwnProperty('_invert_window_tag')) {
 				let effect = new TrueInvertWindowEffect();
 				actor.add_effect_with_name('invert-color', effect);
 			}
 		}, this);
 	},
 
-	disable: function() {
+	disable: function () {
 		Main.wm.removeKeybinding(SHORTCUT);
 
-		global.get_window_actors().forEach(function(actor) {
+		global.get_window_actors().forEach(function (actor) {
 			actor.remove_effect_by_name('invert-color');
 		}, this);
 	}
