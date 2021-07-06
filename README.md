@@ -26,6 +26,6 @@ To make the ZIP for the GNOME Shell Extension website:
 
 1. Make a copy of the directory or clone it to a new place.
 2. `rm -rf .git`
-3. `zip true-color-invert@jackkenney.git * **/*`
+3. `zip true-color-invert@jackkenney.zip * **/*`
 4. Upload to the GNOME website for review.
 5. Tag `main` at that time with a release tag according to the revisions made.
