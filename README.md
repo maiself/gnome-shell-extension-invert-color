@@ -10,6 +10,13 @@ https://extensions.gnome.org/extension/3530/true-color-invert/
 
 `Super + I`
 
+## Debugging
+
+Errors will print out here:
+```bash
+journalctl -f -o cat /usr/bin/gnome-shell
+```
+
 ## Contributing
 
 Before submitting pull requests, please run:
