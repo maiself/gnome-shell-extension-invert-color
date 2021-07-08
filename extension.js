@@ -1,34 +1,31 @@
 const Main = imports.ui.main;
-const Lang = imports.lang;
+const GObject = imports.gi.GObject;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const Clutter = imports.gi.Clutter;
-const ExtensionUtils = imports.misc.extensionUtils;
 
+const ExtensionUtils = imports.misc.extensionUtils;
 const Self = ExtensionUtils.getCurrentExtension();
 const Convenience = Self.imports.convenience;
 
 const SHORTCUT = 'invert-window-shortcut';
 
-const TrueInvertWindowEffect = new Lang.Class({
+const TrueInvertWindowEffect = new GObject.registerClass({
 	Name: 'TrueInvertWindowEffect',
-	Extends: Clutter.ShaderEffect,
-
-	vfunc_get_static_shader_source: function () {
+}, class TrueInvertWindowEffect extends Clutter.ShaderEffect {
+	vfunc_get_static_shader_source() {
 		return `
 			uniform bool invert_color;
 			uniform float opacity = 1.0;
 			uniform sampler2D tex;
 
 			/**
-			 * based on shift_whitish.glsl https://github.com/vn971/linux-color-inversion
-			 * with minor edits
+			 * based on shift_whitish.glsl https://github.com/vn971/linux-color-inversion with minor edits
 			 */
 			void main() {
 				vec4 c = texture2D(tex, cogl_tex_coord_in[0].st);
-				
-				/* shifted */
-				float white_bias = 0.1;
+
+				float white_bias = 0.1; // lower -> higher contrast
 				float m = 1.0 + white_bias;
 				
 				float shift = white_bias + c.a - min(c.r, min(c.g, c.b)) - max(c.r, max(c.g, c.b));
@@ -37,24 +34,21 @@ const TrueInvertWindowEffect = new Lang.Class({
 						(shift + c.g) / m, 
 						(shift + c.b) / m, 
 						c.a);
-					
-				/* non-shifted */
-				// float shift = c.a - min(c.r, min(c.g, c.b)) - max(c.r, max(c.g, c.b));
-				// c = vec4(shift + c.r, shift + c.g, shift + c.b, c.a);
 
 				cogl_color_out = c;
 			}
 		`;
-	},
+	}
 
-	vfunc_paint_target: function (paint_node = null, paint_context = null) {
+	vfunc_paint_target(paint_node = null, paint_context = null) {
 		this.set_uniform_value("tex", 0);
+
 		if (paint_node && paint_context)
-			this.parent(paint_node, paint_context);
+			super.vfunc_paint_target(paint_node, paint_context);
 		else if (paint_node)
-			this.parent(paint_node);
+			super.vfunc_paint_target(paint_node);
 		else
-			this.parent();
+			super.vfunc_paint_target();
 	}
 });
 
@@ -86,7 +80,7 @@ InvertWindow.prototype = {
 			this.settings,
 			Meta.KeyBindingFlags.NONE,
 			Shell.ActionMode.NORMAL,
-			Lang.bind(this, this.toggle_effect)
+			this.toggle_effect
 		);
 
 		global.get_window_actors().forEach(function (actor) {
