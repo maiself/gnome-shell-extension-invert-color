@@ -6,7 +6,6 @@ const Clutter = imports.gi.Clutter;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Self = ExtensionUtils.getCurrentExtension();
-const Convenience = Self.imports.convenience;
 
 const SHORTCUT = 'invert-window-shortcut';
 
@@ -53,7 +52,7 @@ const TrueInvertWindowEffect = new GObject.registerClass({
 });
 
 function InvertWindow() {
-	this.settings = Convenience.getSettings();
+	this.settings = ExtensionUtils.getSettings(Self.metadata["settings-schema"]);
 }
 
 InvertWindow.prototype = {
