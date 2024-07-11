@@ -1,20 +1,17 @@
-const Main = imports.ui.main;
-const Lang = imports.lang;
-const Meta = imports.gi.Meta;
-const Shell = imports.gi.Shell;
-const Clutter = imports.gi.Clutter;
-const ExtensionUtils = imports.misc.extensionUtils;
+import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import Meta from 'gi://Meta';
+import Shell from 'gi://Shell';
+import Clutter from 'gi://Clutter';
+import GObject from 'gi://GObject';
 
-const Self = ExtensionUtils.getCurrentExtension();
-const Convenience = Self.imports.convenience;
+import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+
 
 const SHORTCUT = 'invert-window-shortcut';
 
-const InvertWindowEffect = new Lang.Class({
-	Name: 'InvertWindowEffect',
-	Extends: Clutter.ShaderEffect,
-
-	vfunc_get_static_shader_source: function() {
+export const InvertWindowEffect = GObject.registerClass(
+class InvertWindowEffect extends Clutter.ShaderEffect {
+	vfunc_get_static_shader_source() {
 		return ' \
 			uniform sampler2D tex; \
 			void main() { \
@@ -27,20 +24,17 @@ const InvertWindowEffect = new Lang.Class({
 				cogl_color_out = color * cogl_color_in; \
 			} \
 		';
-	},
+	}
 
-	vfunc_paint_target: function(paint_context) {
+	vfunc_paint_target(...args) {
 		this.set_uniform_value("tex", 0);
-		this.parent(paint_context);
+		super.vfunc_paint_target(...args);
 	}
 });
 
-function InvertWindow() {
-	this.settings = Convenience.getSettings();
-}
 
-InvertWindow.prototype = {
-	toggle_effect: function() {
+export default class InvertWindow extends Extension {
+	toggle_effect() {
 		global.get_window_actors().forEach(function(actor) {
 			let meta_window = actor.get_meta_window();
 			if(meta_window.has_focus()) {
@@ -55,15 +49,17 @@ InvertWindow.prototype = {
 				}
 			}
 		}, this);
-	},
+	}
 
-	enable: function() {
+	enable() {
+		this._settings = this.getSettings();
+
 		Main.wm.addKeybinding(
 			SHORTCUT,
-			this.settings,
+			this._settings,
 			Meta.KeyBindingFlags.NONE,
 			Shell.ActionMode.NORMAL,
-			Lang.bind(this, this.toggle_effect)
+			() => { this.toggle_effect(); }
 		);
 
 		global.get_window_actors().forEach(function(actor) {
@@ -73,29 +69,17 @@ InvertWindow.prototype = {
 				actor.add_effect_with_name('invert-color', effect);
 			}
 		}, this);
-	},
+	}
 
-	disable: function() {
+	disable() {
 		Main.wm.removeKeybinding(SHORTCUT);
 
 		global.get_window_actors().forEach(function(actor) {
 			actor.remove_effect_by_name('invert-color');
 		}, this);
+
+		this._settings = null;
 	}
 };
 
-let invert_window;
-
-function init() {
-}
-
-function enable() {
-	invert_window = new InvertWindow();
-	invert_window.enable();
-}
-
-function disable() {
-	invert_window.disable();
-	invert_window = null;
-}
 
