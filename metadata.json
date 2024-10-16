@@ -5,7 +5,8 @@
 	"url": "https://github.com/maiself/gnome-shell-extension-invert-color",
 	"shell-version": [
 		"45",
-		"46"
+		"46",
+		"47"
 	],
 	"settings-schema": "org.gnome.shell.extensions.invert-window",
 	"version": 5
